@@ -1,0 +1,102 @@
+.data 
+
+Input: .asciiz "\nEnter Octal Number :" 
+
+error: .asciiz "Number invalid"
+
+result: .asciiz "Octal number in decimal is :" 
+
+
+.text
+
+.globl main
+
+ main:
+
+ #initializing values
+ 
+   li $t1,100
+   li $t2, 999
+   li $t3,10
+ 
+  
+
+   li $v0,4      #string display
+
+   la $a0,Input 		
+
+   syscall
+
+
+   li $v0,5    # taking input 
+
+   syscall  
+
+   move $t0,$v0  #move input value from $v0 to $t0
+
+
+
+  blt $t0,$t1,Invalid
+
+  bgt $t0, $t2, Invalid
+
+
+div $t0,$t1    #div input by 100
+
+mfhi $t0       #store remainder in $t0
+mflo $s0       #store quotient in $s0  "first digit"
+
+
+div $t0,$t3    #div remainder by 10
+mflo $s1       #store quotient in $s1   "second digit"
+mfhi $s2      #store remainder in $s2   "third digit"
+
+
+  
+octalToDecimal:
+
+#initializing values
+  li $t4,64
+  li $t5,8
+
+  mult $s0,$t4    #multiply "first digit" by 64
+
+  mflo $s0
+
+  mult $s1,$t5    #multiply "second digit" by 8
+
+  mflo $s1
+
+
+  add $s0,$s0,$s1  #add "second digit" to "first digit" and stor resault in $s0
+
+  add $s0,$s0,$s2   #add "third digit" to "resault" and stor final resault in $s0
+
+
+
+  li $v0,4
+
+  la $a0,result   #string display
+
+  syscall 
+
+
+  li $v0,1
+
+  move $a0,$s0	  #display integer "result"
+
+  syscall
+
+  j exit
+
+ Invalid:
+ li $v0,4
+ la $a0,error   #string display
+ syscall
+
+  j exit
+
+   
+ exit:
+li $v0,10
+syscall
